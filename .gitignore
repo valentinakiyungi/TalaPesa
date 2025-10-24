@@ -1,4 +1,3 @@
-
 # Dependencies
 /node_modules
 /.pnp
@@ -21,8 +20,8 @@ firestore.rules
 
 # Next.js
 /.next/
-/out/
-/build
+out/
+build
 
 # Testing
 /coverage
@@ -38,6 +37,7 @@ yarn-error.log*
 .env.local
 .env.development
 .env.production
+.env*
 
 # Vercel
 .vercel
@@ -58,4 +58,3 @@ next-env.d.ts
 *.swp
 *.swo
 *.tmp
-
