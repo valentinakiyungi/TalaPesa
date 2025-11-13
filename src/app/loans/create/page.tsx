@@ -1,109 +1,162 @@
+
 'use client';
-import { useState, useEffect } from 'react';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Loan } from '@/types/loan';
-import { Customer } from '@/types/customer';
+
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { generateLoanPDF } from '@/lib/pdf';
+import { ArrowLeft, Download } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CreateLoan() {
-  const [formData, setFormData] = useState<Partial<Loan>>({
-    repaymentSchedule: [],
-  });
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerId, setCustomerId] = useState('');
+  const [amount, setAmount] = useState('');
+  const [term, setTerm] = useState('');
+  const [interestRate] = useState(15); // 15% flat
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      const snapshot = await getDocs(collection(db, 'customers'));
-      setCustomers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Customer)));
-    };
-    fetchCustomers();
-  }, []);
+  const calculateLoan = () => {
+    const principal = Number(amount);
+    const days = Number(term);
+    const interest = principal * (interestRate / 100);
+    const total = principal + interest;
+    const daily = total / days;
 
-  const generateSchedule = (amount: number, termMonths: number) => {
-    const monthlyRate = (formData.interestRate || 0) / 12 / 100;
-    const monthlyPayment = (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -termMonths));
-    const schedule = Array.from({ length: termMonths }, (_, i) => {
-      const dueDate = new Date();
-      dueDate.setMonth(dueDate.getMonth() + i + 1);
-      return { dueDate: dueDate.toISOString(), amountDue: monthlyPayment, paid: false };
-    });
-    setFormData({ ...formData, repaymentSchedule: schedule });
+    const schedule = Array.from({ length: days }, (_, i) => ({
+      date: new Date(Date.now() + (i + 1) * 86400000).toLocaleDateString('en-GB'),
+      amount: Math.round(daily),
+    }));
+
+    return { total, daily, schedule };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
+
     try {
-      const loanData = {
-        ...formData,
-        status: 'Pending',
+      const customerSnap = await getDoc(doc(db, 'customers', customerId));
+      if (!customerSnap.exists()) throw new Error('Customer not found');
+
+      const customer = customerSnap.data();
+      const { total, daily, schedule } = calculateLoan();
+
+      const loan = {
+        customerId,
+        amount: Number(amount),
+        interestRate,
+        term: Number(term),
+        totalRepayable: total,
+        dailyPayment: daily,
+        schedule,
+        status: 'active',
         createdAt: new Date().toISOString(),
-      } as Loan;
-      await addDoc(collection(db, 'loans'), loanData);
-      router.push('/loans');
-    } catch (error) {
-      console.error('Error creating loan:', error);
+        createdBy: JSON.parse(localStorage.getItem('user')!).uid,
+      };
+
+      const loanRef = await addDoc(collection(db, 'loans'), loan);
+      const loanWithId = { id: loanRef.id, ...loan };
+
+      // Generate PDF
+      const doc = await generateLoanPDF(loanWithId, customer);
+      const blob = doc.output('blob');
+      setPdfBlob(blob);
+
+      alert('Loan created! Download contract below.');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const downloadPDF = () => {
+    if (!pdfBlob) return;
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `loan-contract-${Date.now()}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Create New Loan</h1>
-      <form onSubmit={handleSubmit}>
-        <select
-          value={formData.customerId || ''}
-          onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-          className="w-full p-2 border rounded mb-4"
-          required
-        >
-          <option value="">Select Customer</option>
-          {customers.map((customer) => (
-            <option key={customer.id} value={customer.id}>
-              {customer.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          placeholder="Loan Amount"
-          value={formData.amount || ''}
-          onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
-        <input
-          type="number"
-          placeholder="Interest Rate (%)"
-          value={formData.interestRate || ''}
-          onChange={(e) => setFormData({ ...formData, interestRate: Number(e.target.value) })}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Loan Type"
-          value={formData.loanType || ''}
-          onChange={(e) => setFormData({ ...formData, loanType: e.target.value })}
-          className="w-full p-2 border rounded mb-4"
-        />
-        <input
-          type="number"
-          placeholder="Term (Months)"
-          onChange={(e) => generateSchedule(formData.amount || 0, Number(e.target.value))}
-          className="w-full p-2 border rounded mb-4"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded disabled:opacity-50"
-        >
-          {loading ? 'Creating...' : 'Create Loan'}
-        </button>
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center gap-3 mb-6">
+        <Link href="/loans" className="btn btn-ghost btn-circle">
+          <ArrowLeft size={20} />
+        </Link>
+        <h1 className="text-3xl font-bold">Create New Loan</h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="form-control">
+          <label className="label">Customer ID</label>
+          <input
+            type="text"
+            placeholder="cus_123"
+            value={customerId}
+            onChange={(e) => setCustomerId(e.target.value)}
+            className="input input-bordered"
+            required
+          />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="form-control">
+            <label className="label">Loan Amount (TZS)</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="input input-bordered"
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">Term (Days)</label>
+            <input
+              type="number"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              className="input input-bordered"
+              required
+            />
+          </div>
+        </div>
+
+        {amount && term && (
+          <div className="alert alert-info">
+            <div>
+              <strong>Total Repayable:</strong> TZS {calculateLoan().total.toLocaleString()}<br />
+              <strong>Daily Payment:</strong> TZS {calculateLoan().daily.toLocaleString()}
+            </div>
+          </div>
+        )}
+
+        {error && <div className="alert alert-error">{error}</div>}
+
+        <div className="flex gap-3">
+          <button type="submit" disabled={loading} className="btn btn-success flex-1">
+            {loading ? 'Creating...' : 'Create Loan'}
+          </button>
+          <Link href="/loans" className="btn btn-ghost flex-1">Cancel</Link>
+        </div>
       </form>
+
+      {pdfBlob && (
+        <div className="mt-8 text-center">
+          <button onClick={downloadPDF} className="btn btn-primary">
+            <Download size={18} className="mr-2" />
+            Download Contract PDF
+          </button>
+        </div>
+      )}
     </div>
   );
 }

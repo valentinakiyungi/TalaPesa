@@ -1,44 +1,41 @@
+
 'use client';
 
-import { useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import DashboardLayout from './Layout/DashboardLayout';
 
-interface AuthWrapperProps {
-  children: ReactNode;
-}
-
-export default function AuthWrapper({ children }: AuthWrapperProps) {
-  const [user, setUser] = useState<User | null>(null);
+export default function AuthWrapper({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      setUser(JSON.parse(stored));
+    }
+    setLoading(false);
+  }, []);
 
-      if (!currentUser) {
-        router.replace('/login'); // Redirect if not logged in
-      }
-    });
-
-    return () => unsubscribe();
-  }, [router]);
+  // Allow public access to login and signup
+  if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/signup')) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-700">
-        Loading...
+      <div className="flex min-h-screen items-center justify-center bg-base-200">
+        <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
   }
 
   if (!user) {
-    // While redirecting, don't render children
+    router.replace('/auth/login');
     return null;
   }
 
-  return <>{children}</>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 }
