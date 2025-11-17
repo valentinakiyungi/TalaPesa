@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,7 +16,7 @@ export default function EditCustomer({ params }: { params: { id: string } }) {
     address: '',
     financialHistory: {
       creditScore: 0,
-      previousLoans: [], // ← ALWAYS array
+      previousLoans: [],
     },
     documentUrls: [],
   });
@@ -75,7 +74,6 @@ export default function EditCustomer({ params }: { params: { id: string } }) {
     }
   };
 
-  // Safe handler — NO TYPE ERRORS
   const handleFinancialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -164,7 +162,7 @@ export default function EditCustomer({ params }: { params: { id: string } }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="btn btn-primary w-full"
         >
           {loading ? 'Updating...' : 'Update Customer'}
         </button>

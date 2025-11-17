@@ -1,137 +1,111 @@
-
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import {
-  Home,
-  Users,
-  DollarSign,
-  FileText,
-  BarChart3,
-  UserCog,
-  UserCheck,
-  FilePlus,   // NEW
+import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, 
+  Users, 
+  DollarSign, 
+  FileText, 
+  BarChart3, 
+  Settings,
   LogOut,
   Menu,
+  X,
+  Home,
+  Receipt,
+  PiggyBank
 } from 'lucide-react';
 import { useState } from 'react';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+const menuItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/customers', label: 'Customers', icon: Users },
+  { href: '/loans/create', label: 'Create Loan', icon: DollarSign },
+  { href: '/loans', label: 'All Loans', icon: Receipt },
+  { href: '/payments', label: 'Payments', icon: FileText },
+  { href: '/expenses', label: 'Expenses', icon: PiggyBank },
+  { href: '/reports', label: 'Reports', icon: BarChart3 },
+  { href: '/staff', label: 'Staff', icon: Users },
+  { href: '/settings', label: 'Settings', icon: Settings },
+];
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-
-  const navItems = [
-    { href: '/', label: 'Dashboard', icon: Home },
-    { href: '/customers', label: 'Customers', icon: Users },
-    { href: '/loans', label: 'Loans', icon: DollarSign },
-    { href: '/loans/create', label: 'Create Loan', icon: FilePlus }, // NEW
-    { href: '/payments', label: 'Payments', icon: FileText },
-    { href: '/expenses', label: 'Expenses', icon: FileText },
-    { href: '/reports', label: 'Reports', icon: BarChart3 },
-    { href: '/staff', label: 'Staff', icon: UserCog },
-    { href: '/staff/approval', label: 'Approve Staff', icon: UserCheck },
-  ];
-
-  const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
-    return pathname.startsWith(href);
-  };
-
-  const handleLogout = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loggingOut) return;
-
-    setLoggingOut(true);
-    localStorage.removeItem('user');
-
-    try {
-      await fetch('/api/logout', { method: 'POST' });
-      router.push('/auth/login');
-    } catch {
-      router.push('/auth/login');
-    } finally {
-      setLoggingOut(false);
-    }
-  };
 
   return (
-    <div className="min-h-screen flex bg-base-200">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Mobile Menu Button */}
       <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 btn btn-circle btn-primary"
-        aria-label="Toggle menu"
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-4 left-4 z-50 lg:hidden bg-blue-700 text-white p-3 rounded-xl shadow-2xl hover:bg-blue-800 transition"
       >
-        <Menu size={20} />
+        {isOpen ? <X size={28} /> : <Menu size={28} />}
       </button>
 
       {/* Sidebar */}
-      <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-base-300 text-base-content shadow-xl transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        } flex flex-col`}
-      >
-        {/* Logo */}
-        <div className="p-6 text-xl font-bold border-b border-base-200 text-center">
-          Cash Loan System
+      <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-gradient-to-b from-blue-900 to-indigo-950 text-white transform transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      } lg:translate-x-0`}>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="p-8 border-b border-blue-800">
+            <h1 className="text-3xl font-bold text-white">Mkopo wa Haraka Tanzania</h1>
+            <p className="text-blue-200 text-sm mt-1">Cash Loan System</p>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-6 space-y-2 overflow-y-auto">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+              
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
+                    isActive
+                      ? 'bg-white text-blue-900 shadow-lg font-bold'
+                      : 'text-blue-100 hover:bg-blue-800 hover:text-white'
+                  }`}
+                >
+                  <Icon size={24} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Logout */}
+          <div className="p-6 border-t border-blue-800">
+            <button className="flex items-center gap-4 px-6 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white w-full transition font-semibold text-lg shadow-lg">
+              <LogOut size={24} />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-                  active
-                    ? 'bg-primary text-white shadow-md'
-                    : 'hover:bg-base-200 text-base-content/80'
-                }`}
-              >
-                <Icon size={18} />
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout */}
-        <form onSubmit={handleLogout} className="p-4 border-t border-base-200">
-          <button
-            type="submit"
-            disabled={loggingOut}
-            className={`flex items-center gap-2 w-full p-3 rounded-lg transition-all ${
-              loggingOut
-                ? 'bg-error/70 text-white cursor-not-allowed'
-                : 'bg-error text-white hover:bg-red-700'
-            }`}
-          >
-            <LogOut size={18} />
-            <span className="font-medium">
-              {loggingOut ? 'Logging out...' : 'Logout'}
-            </span>
-          </button>
-        </form>
       </aside>
 
       {/* Mobile Overlay */}
-      {sidebarOpen && (
+      {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black bg-opacity-60 z-30 lg:hidden"
+          onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">{children}</div>
+      <main className="lg:ml-72 min-h-screen">
+        <div className="p-6 lg:p-10">
+          {children}
+        </div>
       </main>
     </div>
   );

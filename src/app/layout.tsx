@@ -1,23 +1,21 @@
-
+import QueryProvider from './_providers/QueryProvider';
+import DashboardLayout from '@/components/Layout/DashboardLayout';
 import './globals.css';
-import { Inter } from 'next/font/google';
-import AuthWrapper from '@/components/AuthWrapper';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Cash Loan System',
-  description: 'Secure loan management for Arusha',
+  title: 'TalaPesa - Mkopo wa Haraka Tanzania',
+  description: 'Instant loans, trusted by thousands',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {/* Only ONE AuthWrapper here */}
-        <AuthWrapper>
-          {children}
-        </AuthWrapper>
+    <html lang="sw">
+      <body className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+        <QueryProvider>
+          <DashboardLayout>
+            {children}
+          </DashboardLayout>
+        </QueryProvider>
       </body>
     </html>
   );

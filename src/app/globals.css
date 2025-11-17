@@ -2,34 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Optional custom styles */
-body {
-  @apply bg-base-200 text-base-content;
-  font-family: 'Inter', sans-serif;
-  background: var(--background);
-  color: var(--foreground);
-}
+/* BEAUTIFUL FINTECH STYLE */
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300;
+  }
+  
+  .btn {
+    @apply inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-200 focus:outline-none focus:ring-4 disabled:opacity-60 disabled:cursor-not-allowed;
+  }
 
-/* Style scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-}
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300 px-6 py-3 text-lg shadow-md hover:shadow-lg;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: theme('colors.primary');
-  border-radius: 8px;
-}
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-300 px-6 py-3 text-lg shadow-md hover:shadow-lg;
+  }
 
-/* Custom CSS variables for light/dark themes */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  .btn-ghost {
+    @apply text-gray-600 hover:bg-gray-100 px-4 py-3 rounded-xl;
+  }
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 outline-none transition;
+  }
+
+  .label-text {
+    @apply font-semibold text-gray-700;
+  }
+
+  .alert-info {
+    @apply bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl;
+  }
+
+  .alert-error {
+    @apply bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl;
+  }
+
+  /* Status Badges - Beautiful */
+  .status-paid {
+    @apply bg-green-100 text-green-800 font-bold px-4 py-2 rounded-full text-sm;
+  }
+  .status-pending {
+    @apply bg-yellow-100 text-yellow-800 font-bold px-4 py-2 rounded-full text-sm;
+  }
+  .status-overdue {
+    @apply bg-red-100 text-red-800 font-bold px-4 py-2 rounded-full text-sm;
+  }
+
+  /* Table Style */
+  .table {
+    @apply w-full border-collapse;
+  }
+  .table th {
+    @apply text-left font-bold text-gray-700 pb-4 border-b-2 border-gray-200;
+  }
+  .table td {
+    @apply py-4 border-b border-gray-100;
+  }
+  .table tr:hover {
+    @apply bg-gray-50;
   }
 }

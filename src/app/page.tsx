@@ -1,51 +1,88 @@
-
 'use client';
 
 import Link from 'next/link';
+import { ArrowRight, Users, DollarSign, FileText, Clock } from 'lucide-react';
 
 export default function Dashboard() {
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900">Welcome back, Valentina!</h1>
+          <p className="text-gray-600 mt-2">Here's what's happening with your loans today.</p>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Quick Stats */}
-        <div className="card bg-base-100 shadow hover:shadow-lg transition-shadow">
-          <div className="card-body">
-            <h3 className="card-title">Total Loans</h3>
-            <p className="text-3xl font-bold text-primary">TZS 12.5M</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-100">Total Loans</p>
+                <p className="text-3xl font-bold mt-2">TZS 48.2M</p>
+              </div>
+              <DollarSign size={40} className="opacity-80" />
+            </div>
+          </div>
+
+          <div className="card bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100">Active Customers</p>
+                <p className="text-3xl font-bold mt-2">142</p>
+              </div>
+              <Users size={40} className="opacity-80" />
+            </div>
+          </div>
+
+          <div className="card bg-gradient-to-r from-yellow-500 to-orange-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-yellow-100">Due Today</p>
+                <p className="text-3xl font-bold mt-2">TZS 1.8M</p>
+              </div>
+              <Clock size={40} className="opacity-80" />
+            </div>
+          </div>
+
+          <div className="card bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100">Total Contracts</p>
+                <p className="text-3xl font-bold mt-2">89</p>
+              </div>
+              <FileText size={40} className="opacity-80" />
+            </div>
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow hover:shadow-lg transition-shadow">
-          <div className="card-body">
-            <h3 className="card-title">Active Customers</h3>
-            <p className="text-3xl font-bold text-success">48</p>
-          </div>
-        </div>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link href="/loans/create" className="card text-center hover:scale-105 transition">
+            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <DollarSign className="text-blue-600" size={32} />
+            </div>
+            <h3 className="text-xl font-bold">Create New Loan</h3>
+            <p className="text-gray-600 mt-2">Issue a new loan to customer</p>
+            <ArrowRight className="mx-auto mt-4 text-blue-600" />
+          </Link>
 
-        <div className="card bg-base-100 shadow hover:shadow-lg transition-shadow">
-          <div className="card-body">
-            <h3 className="card-title">Due Today</h3>
-            <p className="text-3xl font-bold text-warning">TZS 850K</p>
-          </div>
-        </div>
-      </div>
+          <Link href="/customers" className="card text-center hover:scale-105 transition">
+            <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="text-green-600" size={32} />
+            </div>
+            <h3 className="text-xl font-bold">Manage Customers</h3>
+            <p className="text-gray-600 mt-2">View and edit customer profiles</p>
+            <ArrowRight className="mx-auto mt-4 text-green-600" />
+          </Link>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <Link href="/customers/new" className="btn btn-outline btn-primary">
-            Add Customer
-          </Link>
-          <Link href="/loans/create" className="btn btn-outline btn-success">
-            Create Loan
-          </Link>
-          <Link href="/payments/process" className="btn btn-outline btn-accent">
-            Record Payment
-          </Link>
-          <Link href="/expenses/new" className="btn btn-outline btn-secondary">
-            Add Expense
+          <Link href="/payments" className="card text-center hover:scale-105 transition">
+            <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="text-purple-600" size={32} />
+            </div>
+            <h3 className="text-xl font-bold">View Payments</h3>
+            <p className="text-gray-600 mt-2">Track all incoming payments</p>
+            <ArrowRight className="mx-auto mt-4 text-purple-600" />
           </Link>
         </div>
       </div>
