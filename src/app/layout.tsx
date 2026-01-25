@@ -40,7 +40,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   if (isAuthPage || !user) {
     return (
       <html lang="sw">
-        <body><QueryProvider>{children}</QueryProvider></body>
+        <body>
+          <QueryProvider>{children}</QueryProvider>
+        </body>
       </html>
     );
   }
