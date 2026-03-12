@@ -144,7 +144,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-8 pb-16 lg:pb-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto space-y-8 pb-16 lg:pb-8 px-4 sm:px-6 lg:px-8 sm:ml-56">
       <div className="text-center">
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-2">
           Karibu!
@@ -158,13 +158,13 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link href="/loans/issued" className="block">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 sm:p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer min-w-0"></div></Link>">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm sm:text-lg font-medium">Total Loans Issued</p>
-                <p className="text-4xl sm:text-5xl font-bold mt-2">{stats.totalLoans}</p>
+                <p className="text-blue-100 text-sm sm:text-lg font-medium truncate">Total Loans Issued</p>
+                <p className="text-2xl sm:text-4xl md:text-5xl font-bold mt-2 truncate">{stats.totalLoans}</p>
               </div>
               <FileText className="w-12 h-12 sm:w-16 sm:h-16 opacity-80" />
             </div>

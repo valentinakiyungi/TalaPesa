@@ -28,7 +28,7 @@ export default function AllLoans() {
   }
 
   return (
-    <div className="p-8">
+    <div className="max-w-7xl mx-auto p-8 sm:ml-56">
       {/* Back to Dashboard Button */}
       <div className="mb-8">
         <Link
@@ -55,26 +55,26 @@ export default function AllLoans() {
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-xl shadow">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="overflow-x-auto w-full bg-white rounded-xl shadow p-4 sm:p-0">
+          <table className="min-w-[600px] sm:min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   Mteja
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-2 sm:py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   Kiasi (TZS)
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   Jumla ya Kulipa (TZS)
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   Hali
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   Tarehe
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   Hatua
                 </th>
               </tr>
@@ -82,16 +82,16 @@ export default function AllLoans() {
             <tbody className="bg-white divide-y divide-gray-200">
               {loans.map((loan) => (
                 <tr key={loan.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-5 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-3 sm:px-6 py-2 sm:py-5 whitespace-nowrap text-sm text-gray-900 truncate">
                     {loan.customerName || 'Unknown'}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-3 sm:px-6 py-2 sm:py-5 whitespace-nowrap text-sm text-gray-900 truncate">
                     {loan.principal ? loan.principal.toLocaleString('en-US') : '-'}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-900">
+                  <td className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-5 whitespace-nowrap text-sm text-gray-900 truncate">
                     {loan.totalAmount ? loan.totalAmount.toLocaleString('en-US') : '-'}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
+                  <td className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-5 whitespace-nowrap">
                     <span
                       className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         loan.status === 'active'
@@ -112,7 +112,7 @@ export default function AllLoans() {
                         : loan.status || 'N/A'}
                     </span>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
+                  <td className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-5 whitespace-nowrap text-sm text-gray-500">
                     {loan.createdAt?.toDate?.()
                       ? loan.createdAt.toDate().toLocaleDateString('sw-TZ', {
                           year: 'numeric',
@@ -121,7 +121,7 @@ export default function AllLoans() {
                         })
                       : '-'}
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm">
+                  <td className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-5 whitespace-nowrap text-sm">
                     <Link
                       href={`/loans/${loan.id}`}
                       className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
