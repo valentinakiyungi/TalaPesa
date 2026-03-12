@@ -1,6 +1,6 @@
 'use client';
 
-import Sidebar from '@/components/Sidebar'; // adjust path if needed
+import Sidebar from '@/components/Sidebar';
 
 export default function ProtectedLayout({
   children,
@@ -10,7 +10,7 @@ export default function ProtectedLayout({
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
-      <main className="flex-1 ml-56 p-6 md:p-8">
+      <main className="flex-1 p-6 md:p-8 sm:ml-56">
         {children}
       </main>
     </div>
