@@ -7,11 +7,8 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const token = request.cookies.get('auth-token')?.value;
 
-  console.log('[Middleware]', url.pathname, 'Token:', token ? 'exists' : 'missing');
-
   if (protectedRoutes.some(route => url.pathname.startsWith(route))) {
     if (!token) {
-      console.log('[Middleware] No token → redirect to login');
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('callbackUrl', encodeURI(request.url));
       return NextResponse.redirect(loginUrl);

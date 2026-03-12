@@ -26,7 +26,6 @@ interface Loan {
   loanDuration?: number;
   nextDueDate?: any;     // Added for today's collection check
   dueDate?: any;         // Added as fallback
-  // Add more fields as needed (e.g. payments, interestRate)
 }
 
 export default function Dashboard() {
@@ -47,64 +46,64 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
 
-    const unsub = onSnapshot(collection(db, 'loans'), (snap) => {
-      const data = snap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Loan[];
+    const unsub = onSnapshot(
+      collection(db, 'loans'),
+      (snap) => {
+        const data = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Loan[];
 
-      let totalDisbursed = 0;
-      let totalCollected = 0;
-      let activeLoans = 0;
-      let overdueLoans = 0;
-      let todayCollections = 0;
+        let totalDisbursed = 0;
+        let totalCollected = 0;
+        let activeLoans = 0;
+        let overdueLoans = 0;
+        let todayCollections = 0;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-      data.forEach(loan => {
-        // Total disbursed: sum of principal for issued/disbursed loans
-        if (loan.status === 'disbursed' || loan.status === 'issued') {
-          totalDisbursed += Number(loan.principal || 0);
-        }
+        data.forEach((loan) => {
+          if (loan.status === 'disbursed' || loan.status === 'issued') {
+            totalDisbursed += Number(loan.principal || 0);
+          }
 
-        // Total collected: approximate as (totalAmount - balanceDue)
-        totalCollected += Number((loan.totalAmount || 0) - (loan.balanceDue || 0));
+          totalCollected += Number((loan.totalAmount || 0) - (loan.balanceDue || 0));
 
-        if (loan.status === 'active' && (loan.balanceDue || 0) > 0) {
-          activeLoans++;
-        }
+          if (loan.status === 'active' && (loan.balanceDue || 0) > 0) {
+            activeLoans++;
+          }
 
-        // Approximate overdue
-        const startDate = loan.createdAt?.toDate?.();
-        if (startDate && (loan.balanceDue || 0) > 0) {
-          const dueDate = new Date(startDate.getTime() + (loan.loanDuration || 0) * 30 * 24 * 60 * 60 * 1000);
-          if (dueDate < today) overdueLoans++;
-        }
+          const startDate = loan.createdAt?.toDate?.();
+          if (startDate && (loan.balanceDue || 0) > 0) {
+            const dueDate = new Date(startDate.getTime() + (loan.loanDuration || 0) * 30 * 24 * 60 * 60 * 1000);
+            if (dueDate < today) overdueLoans++;
+          }
 
-        // Today's collections (placeholder - enhance later with payments)
-        const due = loan.nextDueDate?.toDate?.() || loan.dueDate?.toDate?.();
-        if (due && new Date(due).toDateString() === today.toDateString()) {
-          todayCollections += Number(loan.balanceDue || 0);
-        }
-      });
+          const due = loan.nextDueDate?.toDate?.() || loan.dueDate?.toDate?.();
+          if (due && new Date(due).toDateString() === today.toDateString()) {
+            todayCollections += Number(loan.balanceDue || 0);
+          }
+        });
 
-      setStats({
-        totalLoans: data.length,
-        activeLoans,
-        totalDisbursed,
-        totalCollected,
-        overdueLoans,
-        todayCollections,
-      });
+        setStats({
+          totalLoans: data.length,
+          activeLoans,
+          totalDisbursed,
+          totalCollected,
+          overdueLoans,
+          todayCollections,
+        });
 
-      setLoans(data);
-      setLoading(false);
-    }, (err) => {
-      console.error('Dashboard fetch error:', err);
-      setError('Hitilafu wakati wa kupakia data ya dashboard.');
-      setLoading(false);
-    });
+        setLoans(data);
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Dashboard fetch error:', err);
+        setError('Hitilafu wakati wa kupakia data ya dashboard.');
+        setLoading(false);
+      }
+    );
 
     return () => unsub();
   }, []);
@@ -153,18 +152,28 @@ export default function Dashboard() {
           TalaPesa • Mkopo wa Haraka Tanzania
         </p>
         <p className="text-base sm:text-lg text-gray-500 mt-2">
-          {new Date().toLocaleDateString('sw-TZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          {new Date().toLocaleDateString('sw-TZ', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
         <Link href="/loans/issued" className="block">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer min-w-0"></div></Link>">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer min-w-0">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm sm:text-lg font-medium truncate">Total Loans Issued</p>
-                <p className="text-2xl sm:text-4xl md:text-5xl font-bold mt-2 truncate">{stats.totalLoans}</p>
+                <p className="text-blue-100 text-sm sm:text-lg font-medium truncate">
+                  Total Loans Issued
+                </p>
+                <p className="text-2xl sm:text-4xl md:text-5xl font-bold mt-2 truncate">
+                  {stats.totalLoans}
+                </p>
               </div>
               <FileText className="w-12 h-12 sm:w-16 sm:h-16 opacity-80" />
             </div>

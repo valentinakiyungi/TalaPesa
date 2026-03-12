@@ -1,6 +1,6 @@
 'use client';
 
-import Sidebar from '@/components/sidebar'; // adjust path if needed
+import Sidebar from '@/components/Sidebar'; // adjust path if needed
 
 export default function ProtectedLayout({
   children,
