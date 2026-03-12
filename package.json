@@ -2,6 +2,9 @@
   "name": "cash-loan-management-system",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/react": "^2.6.11",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@tanstack/react-query": "^5.90.10",
@@ -17,9 +21,12 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "daisyui": "^4.12.10",
+    "date-fns": "^4.1.0",
     "firebase": "^10.12.2",
+    "firebase-admin": "^13.6.1",
+    "firebase-functions": "^7.0.5",
     "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.3",
+    "jspdf": "^3.0.4",
     "lucide-react": "^0.553.0",
     "next": "^14.2.3",
     "postcss": "^8.4.38",
@@ -32,10 +39,11 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
+    "@types/node": "^18.19.0",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
     "baseline-browser-mapping": "^2.9.14",
+    "esbuild": "^0.27.3",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.3",
     "typescript": "^5.4.5"

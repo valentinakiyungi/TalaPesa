@@ -1,19 +1,12 @@
 {
   "hosting": {
-    "public": "out",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  },
-  "functions": {
-    "source": "functions"
+    "source": ".",
+    "frameworksBackend": {
+      "region": "us-central1",
+      "runtime": "nodejs20"
+    }
   },
   "firestore": {
     "rules": "firestore.rules"
-  },
-  "storage": {
-    "rules": "storage.rules"
   }
 }

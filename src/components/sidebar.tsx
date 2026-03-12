@@ -1,55 +1,99 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, Plus, FileText, Settings, LogOut } from 'lucide-react';
 import { auth } from '@/lib/firebase';
-import { LayoutDashboard, FileText, LogOut, PlusCircle } from 'lucide-react';
+import { signOut } from 'firebase/auth';
 
 export default function Sidebar() {
+  const pathname = usePathname();
   const router = useRouter();
 
   const handleLogout = async () => {
-    await signOut(auth);
-    router.push('/login');
+    try {
+      await signOut(auth);
+      // Optional: clear any custom cookie if you were using one
+      document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      
+      // Force redirect and refresh to clear stale state
+      router.replace('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      alert('Logout failed. Please try again.');
+    }
   };
 
-  const menu = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/loans', label: 'Mikopo Yote', icon: FileText },
-    { href: '/loans/create', label: 'Sajili Mkopo', icon: PlusCircle },
-  ];
-
   return (
-    <div className="w-72 bg-gradient-to-b from-blue-800 to-indigo-900 text-white min-h-screen p-6 flex flex-col">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold">TalaPesa</h1>
-        <p className="text-blue-200 text-sm mt-2">Mkopo wa Haraka</p>
+    <aside className="w-56 bg-gradient-to-b from-blue-900 to-indigo-950 text-white h-screen fixed left-0 top-0 overflow-y-auto transition-all duration-300">
+      <div className="p-5 flex flex-col h-full">
+        {/* Logo / Title */}
+        <h2 className="text-2xl font-bold mb-10 text-center">TalaPesa</h2>
+
+        {/* Main Navigation */}
+        <nav className="space-y-1 flex-grow">
+          <Link
+            href="/dashboard"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 text-base font-medium ${
+              pathname === '/dashboard'
+                ? 'bg-white/15 text-white'
+                : 'hover:bg-white/10 text-gray-200'
+            }`}
+          >
+            <Home size={20} />
+            Dashboard
+          </Link>
+
+          <Link
+            href="/loans"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 text-base font-medium ${
+              pathname === '/loans'
+                ? 'bg-white/15 text-white'
+                : 'hover:bg-white/10 text-gray-200'
+            }`}
+          >
+            <FileText size={20} />
+            All Loans
+          </Link>
+
+          <Link
+            href="/loans/create"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 text-base font-medium ${
+              pathname === '/loans/create'
+                ? 'bg-white/15 text-white'
+                : 'hover:bg-white/10 text-gray-200'
+            }`}
+          >
+            <Plus size={20} />
+            Create a Loan
+          </Link>
+
+          {/* Settings link */}
+          <Link
+            href="/settings"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 text-base font-medium ${
+              pathname === '/settings'
+                ? 'bg-white/15 text-white'
+                : 'hover:bg-white/10 text-gray-200'
+            }`}
+          >
+            <Settings size={20} />
+            Settings
+          </Link>
+        </nav>
+
+        {/* Logout - red, at bottom */}
+        <div className="mt-auto pt-6 border-t border-white/20">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600/90 hover:bg-red-700 text-white text-base font-medium w-full transition-colors duration-200"
+          >
+            <LogOut size={20} />
+            Logout
+          </button>
+        </div>
       </div>
-
-      <nav className="flex-1 space-y-2">
-        {menu.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-4 px-6 py-4 rounded-xl hover:bg-white/20 transition text-lg font-medium"
-            >
-              <Icon size={24} />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-4 px-6 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white transition font-bold text-lg shadow-lg mt-auto"
-      >
-        <LogOut size={24} />
-        Logout
-      </button>
-    </div>
+    </aside>
   );
 }

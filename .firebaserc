@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "esncash"
+    "default": "esncash",
+    "prod": "esn-cash-dep"
   },
   "targets": {},
   "etags": {}
