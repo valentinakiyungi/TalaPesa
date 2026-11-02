@@ -1,15 +1,60 @@
 rules_version = '2';
+
+// TalaPesa security rules.
+// The browser only READS data. Every write goes through the Next.js API
+// (firebase-admin), which enforces roles, plan limits and money rules.
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to read/write their data
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    function signedIn() { return request.auth != null; }
+
+    function membership(orgId) {
+      return get(/databases/$(database)/documents/orgs/$(orgId)/members/$(request.auth.uid));
     }
-    
-    // Allow customers to read their own loan (by phone)
-    match /loans/{phone} {
-      allow read: if request.auth != null || request.auth == null;
-      allow write: if request.auth != null;
+
+    function isMember(orgId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/orgs/$(orgId)/members/$(request.auth.uid))
+        && membership(orgId).data.status == 'active';
+    }
+
+    function isManager(orgId) {
+      return isMember(orgId) && membership(orgId).data.role in ['owner', 'admin'];
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /orgs/{orgId} {
+      allow read: if isMember(orgId);
+      allow write: if false;
+
+      // API keys for Selcom / SMS: server only.
+      match /private/{doc} {
+        allow read, write: if false;
+      }
+
+      // Pending invitations and the activity log are for owners/admins.
+      match /invites/{id} {
+        allow read: if isManager(orgId);
+        allow write: if false;
+      }
+      match /audit/{id} {
+        allow read: if isManager(orgId);
+        allow write: if false;
+      }
+
+      match /{collection}/{docId} {
+        allow read: if isMember(orgId) && !(collection in ['private', 'invites', 'audit']);
+        allow write: if false;
+      }
+    }
+
+    // Selcom order routing: server only.
+    match /paymentOrders/{id} {
+      allow read, write: if false;
     }
   }
 }

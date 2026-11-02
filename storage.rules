@@ -1,8 +1,31 @@
 rules_version = '2';
+
+// Customer documents live at orgs/{orgId}/customers/{customerId}/{file}.
+// Only active members of that org can read them; loan staff can upload.
 service firebase.storage {
   match /b/{bucket}/o {
+
+    function member(orgId) {
+      return firestore.get(/databases/(default)/documents/orgs/$(orgId)/members/$(request.auth.uid));
+    }
+
+    function isMember(orgId) {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/orgs/$(orgId)/members/$(request.auth.uid))
+        && member(orgId).data.status == 'active';
+    }
+
+    match /orgs/{orgId}/customers/{customerId}/{fileName} {
+      allow read: if isMember(orgId);
+      allow create: if isMember(orgId)
+        && member(orgId).data.role in ['owner', 'admin', 'officer']
+        && request.resource.size < 10 * 1024 * 1024
+        && (request.resource.contentType.matches('image/.*') || request.resource.contentType == 'application/pdf');
+      allow update, delete: if false;
+    }
+
     match /{allPaths=**} {
-      allow read, write: if false; // denies all access by default
+      allow read, write: if false;
     }
   }
 }
