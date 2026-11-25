@@ -9,7 +9,7 @@ Loan management software (SaaS) for microlenders, SACCOs and cash lenders in Tan
 | **Workspaces** | Self-service sign-up, 14-day free trial, one private workspace per business, subscription plans (Starter / Growth / Pro) billed monthly through Selcom, read-only mode when a subscription lapses |
 | **Team** | Roles: owner, admin, loan officer, viewer. Invite by link (copy or WhatsApp), change roles, disable access. Every action is written to an activity log |
 | **Customers** | Full profile (NIDA, contacts, income, next of kin, guarantor), document uploads (ID, photo, payslip, signed contract), blacklist, duplicate-phone protection, search, CSV export |
-| **Loan products** | Flat or reducing-balance interest, % per month or per loan, daily / weekly / every-2-weeks / monthly repayments, amount and term limits, processing fee, late fee (percent or fixed) with grace period |
+| **Loan products** | Flat or reducing-balance interest, % per month or per loan, daily/weekly / every-2-weeks / monthly repayments, amount and term limits, processing fee, late fee (percent or fixed) with grace period |
 | **Loans** | Application → approval → disbursement → active / overdue → closed, or rejected / written off. Live schedule preview, per-customer limit of active loans, guarantor rules, loan agreement and statement PDFs |
 | **Repayments** | Record cash / M-Pesa / Mixx by Yas / Airtel Money / HaloPesa / bank payments, automatic allocation (late fee → interest → principal, oldest installment first), receipts, reversals, SMS receipts |
 | **Mobile money** | Send a payment prompt (USSD push) to the customer's phone through the lender's own Selcom account; paid installments update automatically via webhook |
@@ -25,7 +25,7 @@ Anything that touches money runs on the server (Next.js API routes with the Fire
 - **Next.js 14** (App Router) + TypeScript + Tailwind CSS
 - **Firebase**: Authentication (email/password + Google), Firestore, Storage
 - **Selcom** API gateway for mobile-money collection and subscription billing
-- **Beem Africa** or **Africa's Talking** for SMS
+- **Beem Africa** & **Africa's Talking** for SMS
 - Loan maths in `src/lib/engine/loan.ts` — pure functions with unit tests
 
 ```
@@ -44,7 +44,7 @@ src/
     server/                  Auth context, payments, Selcom, SMS, audit
     i18n/                    Kiswahili + English dictionaries
 tests/                       Loan engine tests
-firestore.rules              Tenant-isolated security rules
+firestore. rules:              Tenant-isolated security rules
 storage.rules                Customer document rules
 ```
 
@@ -91,7 +91,7 @@ npm test                       # loan engine tests
 | `CRON_SECRET` | Long random string protecting the daily job |
 | `SELCOM_API_KEY`, `SELCOM_API_SECRET`, `SELCOM_VENDOR` | **Your** Selcom merchant account, used to bill subscriptions. Leave empty for test mode |
 
-Each lending business enters **its own** Selcom and SMS keys in *Settings → Integrations*. Until they do, mobile payments and SMS run in test mode (simulated and logged, nothing real is sent).
+Each lending business enters **its own** Selcom and SMS keys in *Settings → Integrations*. Until they do, mobile payments and SMS run in test mode (simulated and logged; nothing real is sent).
 
 ### Firebase setup (one time)
 
@@ -101,14 +101,14 @@ Each lending business enters **its own** Selcom and SMS keys in *Settings → In
    ```bash
    npm i -g firebase-tools
    firebase login
-   npm run deploy:rules
+   npm run deploy: rules
    ```
 
 ## Deploy
 
-**Vercel (recommended):** import the GitHub repo, add the environment variables, deploy. `vercel.json` schedules the daily job (`/api/cron/daily`, 07:00 Tanzania time) which updates overdue loans and late fees, sends SMS reminders, marks lapsed subscriptions and settles any Selcom payments whose webhook was missed. Vercel sends `CRON_SECRET` automatically.
+**Vercel (recommended):** Import the GitHub repo, add the environment variables, deploy. `vercel.json` schedules the daily job (`/api/cron/daily`, 07:00 Tanzania time), which updates overdue loans and late fees, sends SMS reminders, marks lapsed subscriptions, and settles any Selcom payments whose webhook was missed. Vercel sends `CRON_SECRET` automatically.
 
-**Elsewhere:** any Node 20 host works (`npm run build && npm start`). Call the daily job yourself, e.g. with Google Cloud Scheduler:
+**Elsewhere:** any Node 20 host works (`npm run build && npm start`). Call the daily job yourself, e.g., with Google Cloud Scheduler:
 
 ```
 GET https://YOUR_DOMAIN/api/cron/daily
@@ -131,7 +131,7 @@ Defined in `src/lib/plans.ts` — change prices and limits there.
 ## Before going live
 
 - Have a lawyer review the Terms and Privacy pages (`src/app/terms`, `src/app/privacy`) and confirm your obligations under the Bank of Tanzania microfinance regulations and the Personal Data Protection Act.
-- Rotate the Firebase web API key restrictions in Google Cloud console to your domain.
+- Rotate the Firebase web API key restrictions in the Google Cloud console to your domain.
 - Test one real Selcom payment and one real SMS with small amounts.
 
 ## License
